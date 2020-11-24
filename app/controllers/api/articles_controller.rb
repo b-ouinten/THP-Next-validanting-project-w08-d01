@@ -1,5 +1,6 @@
 class Api::ArticlesController < Api::BaseController
   before_action :set_article, only: [:show, :update, :destroy]
+  before_action :check_rights, only:[:update, :destroy]
 
   # GET /articles
   def index
@@ -42,6 +43,12 @@ class Api::ArticlesController < Api::BaseController
     # Use callbacks to share common setup or constraints between actions.
     def set_article
       @article = Article.find(params[:id])
+    end
+
+    def check_rights
+      if @article.user.id != current_user.id
+        render json: 'You aren\'t authorized !'
+      end
     end
 
     # Only allow a trusted parameter "white list" through.
