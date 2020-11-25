@@ -1,6 +1,8 @@
 class Api::CommentsController < Api::BaseController
+  before_action :authenticate_user!, only: [:create, :update, :destroy]
   before_action :set_comment, only: [:show, :update, :destroy]
   before_action :set_article, only: [:index, :create]
+  before_action :check_author, only: [:update, :destroy]
 
   # GET /articles/:article_id/comments
   def index
@@ -47,6 +49,12 @@ class Api::CommentsController < Api::BaseController
 
     def set_article
       @article = Article.find(params[:article_id])
+    end
+
+    def check_author
+      if @comment.user.id != current_user.id
+        render json: { error: 'You aren\'t autorized !' }
+      end
     end
 
     # Only allow a trusted parameter "white list" through.
