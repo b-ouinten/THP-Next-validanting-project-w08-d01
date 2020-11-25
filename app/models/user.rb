@@ -7,7 +7,11 @@ class User < ApplicationRecord
 
   # Relationships
   has_many :articles
+  has_many :comments
 
+  # Validations
+  validates :email, presence: true
+  
   # Callbacks
 
   private

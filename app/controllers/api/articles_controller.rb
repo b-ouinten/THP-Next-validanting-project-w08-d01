@@ -1,6 +1,7 @@
 class Api::ArticlesController < Api::BaseController
+  before_action :authenticate_user!, only: [:create, :update, :destroy]
   before_action :set_article, only: [:show, :update, :destroy]
-  before_action :check_rights, only:[:update, :destroy]
+  before_action :check_author, only: [:update, :destroy]
 
   # GET /articles
   def index
@@ -9,7 +10,7 @@ class Api::ArticlesController < Api::BaseController
     render json: @articles
   end
 
-  # GET /articles/1
+  # GET /articles/:id
   def show
     render json: @article
   end
@@ -19,13 +20,13 @@ class Api::ArticlesController < Api::BaseController
     @article = Article.new(article_params)
 
     if @article.save
-      render json: @article, status: :created, location: api_article_url
+      render json: @article, status: :created, location: api_article_url(@article)
     else
       render json: @article.errors, status: :unprocessable_entity
     end
   end
 
-  # PATCH/PUT /articles/1
+  # PATCH/PUT /articles/:id
   def update
     if @article.update(article_params)
       render json: @article
@@ -34,7 +35,7 @@ class Api::ArticlesController < Api::BaseController
     end
   end
 
-  # DELETE /articles/1
+  # DELETE /articles/:id
   def destroy
     @article.destroy
   end
@@ -45,9 +46,10 @@ class Api::ArticlesController < Api::BaseController
       @article = Article.find(params[:id])
     end
 
-    def check_rights
+    # Check if current user is the author
+    def check_author
       if @article.user.id != current_user.id
-        render json: 'You aren\'t authorized !'
+        render json: { error: 'You aren\'t authorized !'}
       end
     end
 

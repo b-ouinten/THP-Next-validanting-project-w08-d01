@@ -1,5 +1,5 @@
 class Api::UsersController < Api::BaseController
-  before_action :find_user, only: %w[show]
+  before_action :find_user, only: [:show]
   before_action :check_profile_owner, only: [:show]
 
   def show
@@ -14,7 +14,7 @@ class Api::UsersController < Api::BaseController
 
   def check_profile_owner
     if @user.id != current_user.id 
-      render json: 'You aren\'t authorized !'
+      render json: { error: 'You aren\'t authorized !' }
     end
   end
 
